@@ -1,2 +1,4 @@
-dlts_image
+DLTS Image
 ==========
+
+Please read js/openlayers/README.txt
