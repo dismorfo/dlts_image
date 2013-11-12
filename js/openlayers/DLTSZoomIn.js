@@ -1,12 +1,6 @@
 /* ======================================================================
     OpenLayers/Control/DLTSZoomIn.js
    ====================================================================== */
-
-/* Copyright (c) 2006-2011 by OpenLayers Contributors (see authors.txt for 
- * full list of contributors). Published under the Clear BSD license.  
- * See http://svn.openlayers.org/trunk/openlayers/license.txt for the
- * full text of the license. */
-
 /**
  * @requires OpenLayers/Control.js
  */
@@ -33,17 +27,34 @@ OpenLayers.Control.DLTSZoomIn = OpenLayers.Class(OpenLayers.Control, {
      * Method: trigger
      */
     trigger: function() {
+
+        var zoomInDiv
+          , zoomOutDiv
+          , int_before_zoom_in
+          , max_zoom;
+
+        max_zoom = this.map.resolutions.length - 1;
+        
+        int_before_zoom_in = this.map.zoom;
+        
+        if (int_before_zoom_in === max_zoom) { return }    
+    
+        int_before_zoom_in = int_before_zoom_in + 1;
+
+        zoomInDiv = this.map.getControlsByClass('OpenLayers.Control.DLTSZoomIn')[0].panel_div;
+        
+        zoomOutDiv = this.map.getControlsByClass('OpenLayers.Control.DLTSZoomOut')[0].panel_div;
+        
+        if (int_before_zoom_in === max_zoom) {
+          OpenLayers.Element.addClass(zoomInDiv, 'zoom_in_max');
+        }
+
+        if (OpenLayers.Element.hasClass(zoomOutDiv, 'zoom_out_max')) {
+          OpenLayers.Element.removeClass(zoomOutDiv, 'zoom_out_max');
+        }
+
         this.map.zoomIn();
-        var zoomIdDiv = this.map.getControlsByClass('OpenLayers.Control.DLTSZoomIn')[0].panel_div;
-        var zoomOutDiv = this.map.getControlsByClass('OpenLayers.Control.DLTSZoomOut')[0].panel_div;
-        if ( this.map.zoom === ( this.map.resolutions.length - 1 ) ) {
-          OpenLayers.Element.addClass(zoomIdDiv, 'zoom_in_max');
-        }
-        else {
-          if (OpenLayers.Element.hasClass(zoomOutDiv, 'zoom_out_max')) {
-            OpenLayers.Element.removeClass(zoomOutDiv, 'zoom_out_max');
-          }
-        }
+
     },
 
     CLASS_NAME: "OpenLayers.Control.DLTSZoomIn"
