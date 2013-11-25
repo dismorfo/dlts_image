@@ -119,7 +119,6 @@ function dlts_image_field_load($entity_type, $entities, $field, $instances, $lan
   file_field_load($entity_type, $entities, $field, $instances, $langcode, $items, $age);
 }
 
-
 /**
  * Implements hook_field_presave().
  */
@@ -131,7 +130,19 @@ function dlts_image_field_presave($entity_type, $entity, $field, $instance, $lan
  * Implements hook_field_insert().
  */
 function dlts_image_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  file_field_insert($entity_type, $entity, $field, $instance, $langcode, $items);
+  foreach($items as $key => $item) {
+    if (!isset($item['djakota_width'])) {
+      $djatoka = dlts_image_djatoka_request($item);
+      if (!isset($djatoka['error'])) {
+        $items[$key]['djakota_width'] = $djatoka['width'];
+        $items[$key]['djakota_height'] = $djatoka['height'];
+        $items[$key]['djakota_levels'] = $djatoka['levels'];
+        $items[$key]['djakota_dwtLevels'] = $djatoka['dwtLevels'];
+        $items[$key]['djakota_compositingLayerCount'] = $djatoka['compositingLayerCount'];
+      }
+    }
+  }
+  file_field_insert($entity_type, $entity, $field, $instance, $langcode, $items); 
 }
 
 /**
