@@ -42,7 +42,7 @@ function dlts_image_field_schema($field) {
         'type' => 'int',
         'unsigned' => TRUE,
       ),
-      
+
 	  // we no longer need this; remove?
       'width' => array(
         'description' => 'The width of the image in pixels.',
@@ -79,8 +79,7 @@ function dlts_image_enable() {
 /**
  * Implementation of hook_uninstall().
  */
-function dlts_image_uninstall() { 
+function dlts_image_uninstall() {
   variable_del('dlts_image_djatoka_service');
   variable_del('dlts_image_openlayers_source');
-
 }

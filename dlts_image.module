@@ -80,10 +80,10 @@ function dlts_image_field_instance_settings_form($field, $instance) {
 
   // Remove the description option.
   unset($form['description_field']);
-  
+
   // Remove the file_extensions option, we only accept jp2, tif, tiff.
   unset($form['file_extensions']);
-  
+
   return $form;
 }
 
@@ -91,7 +91,7 @@ function dlts_image_field_widget_form(&$form, &$form_state, $field, $instance, $
 
   // Add display_field setting to field because file_field_widget_form() assumes it is set.
   // $field['settings']['display_field'] = 0;
-  
+
   $elements = file_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
 
   $settings = $instance['settings'];
@@ -130,7 +130,7 @@ function dlts_image_field_presave($entity_type, $entity, $field, $instance, $lan
  * Implements hook_field_insert().
  */
 function dlts_image_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  foreach($items as $key => $item) {
+  foreach ($items as $key => $item) {
     if (!isset($item['djakota_width'])) {
       $djatoka = dlts_image_djatoka_request($item);
       if (!isset($djatoka['error'])) {
@@ -142,7 +142,7 @@ function dlts_image_field_insert($entity_type, $entity, $field, $instance, $lang
       }
     }
   }
-  file_field_insert($entity_type, $entity, $field, $instance, $langcode, $items); 
+  file_field_insert($entity_type, $entity, $field, $instance, $langcode, $items);
 }
 
 /**
@@ -181,14 +181,14 @@ function dlts_image_field_widget_process($element, &$form_state, $form) {
   $instance = field_widget_instance($element, $form_state);
   $settings = $instance['settings'];
   $widget_settings = $instance['widget']['settings'];
-  
+
   $element['#theme'] = 'dlts_image_widget';
-  
+
   // Add the image preview.
   if ($element['#file']) {
-  
+
     $variables = array('path' => $element['#file']->uri);
-    
+
     /**
      * Determine image dimensions and metadata
      * If djakota_*  is available, the others will also be available
@@ -205,10 +205,10 @@ function dlts_image_field_widget_process($element, &$form_state, $form) {
 
     /**
      * Call Djakota Image Server
-     */ 
+     */
     else {
       $djatoka = dlts_image_djatoka_request($element['#file']);
-      
+
       if (!isset($djatoka['error'])) {
         $variables['djakota_width'] = $djatoka['width'];
         $variables['djakota_height'] = $djatoka['height'];
@@ -218,16 +218,16 @@ function dlts_image_field_widget_process($element, &$form_state, $form) {
       }
       else {
         form_set_error('dlts_image', t('Error requesting image metadata from Djakota service. @message (error code @code).', array('@message' => $djatoka['message'], '@error' => $djatoka['error'])));
-        $variables['djakota_width'] = 
-        $variables['djakota_height'] =  
-        $variables['djakota_levels'] = 
-        $variables['djakota_dwtLevels'] = 
+        $variables['djakota_width'] =
+        $variables['djakota_height'] =
+        $variables['djakota_levels'] =
+        $variables['djakota_dwtLevels'] =
         $variables['djakota_compositingLayerCount'] = 0;
       }
     }
-    
+
     /** Store the data in the form */
-    
+
     $element['width'] = array(
       '#type' => 'hidden',
       '#value' => $variables['djakota_width'],
@@ -237,12 +237,12 @@ function dlts_image_field_widget_process($element, &$form_state, $form) {
       '#type' => 'hidden',
       '#value' => $variables['djakota_height'],
     );
-    
+
     $element['djakota_width'] = array(
       '#type' => 'hidden',
       '#value' => $variables['djakota_width'],
     );
-    
+
     $element['djakota_height'] = array(
       '#type' => 'hidden',
       '#value' => $variables['djakota_height'],
@@ -257,7 +257,7 @@ function dlts_image_field_widget_process($element, &$form_state, $form) {
       '#type' => 'hidden',
       '#value' => $variables['djakota_dwtLevels'],
     );
-    
+
     $element['djakota_compositingLayerCount'] = array(
       '#type' => 'hidden',
       '#value' => $variables['djakota_compositingLayerCount'],
@@ -307,8 +307,8 @@ function dlts_image_field_formatter_info() {
   );
 }
 
-/** 
- * Implements hook_field_formatter_view(). 
+/**
+ * Implements hook_field_formatter_view().
  */
 function dlts_image_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
@@ -318,7 +318,7 @@ function dlts_image_field_formatter_view($entity_type, $entity, $field, $instanc
           '#theme' => 'dlts_image_hires',
           '#file' => $item,
         );
-    }  	
+    }
   }
   return $element;
 }
@@ -337,16 +337,18 @@ function dlts_image_field_formatter_view($entity_type, $entity, $field, $instanc
  * @ingroup themable
  */
 function theme_dlts_image_hires($variables) {
-  
+
   $file = $variables['file'];
 
   $fid = 'id-'. $file['fid'];
 
   $fileUri = file_create_url($file['uri']);
- 
+
+  if ( isset ( $file['timestamp'] ) ) $fileUri = $fileUri . '?v=' . $file['timestamp'];
+
   /** Add Openlayers to the page */
   drupal_add_js(variable_get('dlts_image_openlayers_source', 'sites/all/libraries/openlayers/lib/OpenLayers.js'), array('group' => JS_LIBRARY));
-  
+
   if (!isset($file['djakota_width'])) {
   	$djatoka = dlts_image_djatoka_request($file);
 	if (!isset($file['djakota_width'])) {
@@ -366,7 +368,7 @@ function theme_dlts_image_hires($variables) {
       'levels' => $file['djakota_levels'],
       'dwtLevels' => $file['djakota_dwtLevels'],
       'compositingLayerCount' => $file['djakota_compositingLayerCount'],
-      
+
     ),
     'zoom' => isset($file['zoom']) ? $file['zoom'] : 1,
   );
@@ -391,7 +393,7 @@ function theme_dlts_image_hires($variables) {
     '@width' => $file['djakota_width'],
     '@height' => $file['djakota_height'],
     '@levels' => $file['djakota_levels'],
-    '@dwtLevels' => $file['djakota_dwtLevels'], 
+    '@dwtLevels' => $file['djakota_dwtLevels'],
     '@layer' => $file['djakota_compositingLayerCount'],
   );
 
@@ -408,9 +410,13 @@ function dlts_image_djatoka_request($file) {
 
   $service_url = variable_get('dlts_image_djatoka_service', 'http://localhost:8080/adore-djatoka');
 
+  $rft_id = file_create_url($file->uri);
+
+  if ( isset ( $file->timestamp ) ) $rft_id = $rft_id . '?v=' . $file->timestamp;
+
   if (!empty($service_url)) {
 
-    $request = url($service_url . '/resolver', array('absolute' => TRUE, 'query' => array('url_ver' => 'Z39.88-2004', 'svc_id' => 'info:lanl-repo/svc/getMetadata', 'rft_id' => file_create_url($file->uri))));
+    $request = url($service_url . '/resolver', array('absolute' => TRUE, 'query' => array('url_ver' => 'Z39.88-2004', 'svc_id' => 'info:lanl-repo/svc/getMetadata', 'rft_id' => $rft_id)));
 
     $response = drupal_http_request($request);
 
@@ -425,7 +431,7 @@ function dlts_image_djatoka_request($file) {
         'code' => $response->code,
       );
     }
-  }  
+  }
   else {
     $msg = 'Error requesting image metadata from Djakota service. Please configure Djatoka Jpeg 2000 Image Server.';
     watchdog('dlts_image', $msg, array(), WATCHDOG_ERROR);
