@@ -347,7 +347,9 @@ function theme_dlts_image_hires($variables) {
   if ( isset ( $file['timestamp'] ) ) $fileUri = $fileUri . '?v=' . $file['timestamp'];
 
   /** Add Openlayers to the page */
-  drupal_add_js(variable_get('dlts_image_openlayers_source', 'sites/all/libraries/openlayers/lib/OpenLayers.js'), array('group' => JS_LIBRARY));
+  drupal_add_js( variable_get('dlts_image_openlayers_source', 'sites/all/libraries/openlayers/lib/OpenLayers.js'), array('group' => JS_LIBRARY ) ) ;
+  
+  // drupal_add_css('sites/all/libraries/openlayers/theme/default/style.css') ;  
 
   if (!isset($file['djakota_width'])) {
   	$djatoka = dlts_image_djatoka_request($file);
@@ -359,7 +361,7 @@ function theme_dlts_image_hires($variables) {
       $file['djakota_compositingLayerCount'] = $djatoka['compositingLayerCount'];
 	}
   }
-
+  
   $openlayers_options = array(
     'service' => variable_get('dlts_image_djatoka_service', 'http://localhost:8080/adore-djatoka'),
     'imgMetadata' => array(

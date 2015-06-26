@@ -5,7 +5,7 @@ project = "dlts_image"
 
 dependencies[] = libraries
 
-stylesheets[all][] = css/dlts_image-min.css
+stylesheets[all][] = css/dlts_image.css
 
 configure = admin/config/media/dlts-image
 

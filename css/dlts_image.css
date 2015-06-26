@@ -419,3 +419,9 @@ div.olControlSaveFeaturesItemInactive {
   cursor: default;
   opacity: 0.2;
 }
+
+.olControlOverviewMapContainer {
+  position: relative;
+  top: 2%;
+  right: 2%;
+}
