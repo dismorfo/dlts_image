@@ -73,10 +73,22 @@ OpenLayers.DLTS.Page = function ( container, url, config, callback ) {
         enableKinetic: true
       }
     })
-  ],
+  ];
+  
+  // we can also register "tileloaded" event
+  // view-source:http://dev.openlayers.org/releases/OpenLayers-2.12/examples/layerLoadMonitoring.html  
+  OUlayer.events.register("loadstart", OUlayer, function() {
+    OpenLayers.Element.addClass(document.getElementsByTagName('body')[0], 'openlayers-loading');
+  });
 
-  map = new OpenLayers.Map(container, options);
+  OUlayer.events.register("loadend", OUlayer, function() {
+    OpenLayers.Element.removeClass(document.getElementsByTagName('body')[0], 'openlayers-loading');    
+  });
+  
+  var map = new OpenLayers.Map(container, options);
+
   map.addControls(controls);
+  
   map.pan(0, (((map.getSize().h - (map.getTileSize().h * map.resolutions[(map.resolutions.length - (map.getZoom() + 1))])) / 2) - 5));
   
   OpenLayers.DLTS.pages.push(map);
